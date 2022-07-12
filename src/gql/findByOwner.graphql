@@ -1,0 +1,9 @@
+query findByOwner($owner: String!){
+  transactions(owners:[owner]) {
+      edges {
+          node {
+              id
+          }
+      }
+  }
+}

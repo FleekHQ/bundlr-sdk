@@ -1,9 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Arweave = require("arweave");
 import { newTransaction, generateWalletAndAddress, getBalance, mintWalletAndFund } from "./arweave/api";
+// @TODO: Move this to its own module ?
 import { request, gql } from "graphql-request";
-
-// import { findByOwner } from "./gql";
 
 const defaultConfig = {
   host: "127.0.0.1",
@@ -11,8 +10,7 @@ const defaultConfig = {
   protocol: "http",
 };
 
-const gqlEndpoint = "127.0.0.1:1984/graphql";
-
+const gqlEndpoint = `${defaultConfig.host}:${defaultConfig.port}/graphql`;
 export class FleekWeave {
   public address;
   private client;
@@ -31,9 +29,8 @@ export class FleekWeave {
     const { jwk, address } = await generateWalletAndAddress(this.client);
     this.address = address;
     this.jwk = jwk;
-    // @ TODO get this syncd with faucet
-    // for the time being we use a local node
-    // run with npx arlocal
+    // @ TODO get this syncd with faucet, for the time being we use a local node
+    // run - npx arlocal
     await mintWalletAndFund(this.address);
   }
 
