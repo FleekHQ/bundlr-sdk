@@ -1,12 +1,17 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Arweave = require("arweave");
 import { newTransaction, generateWalletAndAddress, getBalance, mintWalletAndFund } from "./arweave/api";
+import { request, gql } from "graphql-request";
+
+// import { findByOwner } from "./gql";
 
 const defaultConfig = {
   host: "127.0.0.1",
   port: 1984,
   protocol: "http",
 };
+
+const gqlEndpoint = "127.0.0.1:1984/graphql";
 
 export class FleekWeave {
   public address;
@@ -48,5 +53,31 @@ export class FleekWeave {
     }
     const tx = await newTransaction(this.client, data, this.jwk);
     return tx;
+  }
+
+  public async getTxs() {
+    if (!this.address) {
+      throw new Error("need to set address");
+    }
+
+    const findByOwner = gql`
+      query findByOwner(owner: String!){
+        transactions(owners:[owner]) {
+            edges {
+                node {
+                    id
+                }
+            }
+        }
+      }
+    `;
+
+    const variables = {
+      owner: this.address,
+    };
+
+    const data = await request(gqlEndpoint, findByOwner, variables);
+    console.log("data is: ", data);
+    return data;
   }
 }
