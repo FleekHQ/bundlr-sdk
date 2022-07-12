@@ -20,5 +20,9 @@
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.2",
     "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "arweave": "^1.11.4",
+    "axios": "^0.27.2"
   }
 }
