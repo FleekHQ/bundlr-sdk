@@ -1,8 +1,9 @@
 import axios from "axios";
 import Util from "util";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { gql, request } from "graphql-request";
 
 const BALANCE = 999999999999;
+const ARWEAVE_GRAPHQL_URL = "http://localhost:1984/graphql";
 
 export async function multipleUploadTxs(client, transaction) {
   try {
@@ -43,6 +44,7 @@ export async function mintWalletAndFund(address, fundBalance = BALANCE) {
       balance: 1,
     });
     await axios.get(`http://127.0.0.1:1984/mint/${address}/${fundBalance}`);
+    console.log(`Funded ${address} with ${fundBalance}`);
     return postWallet.data.address;
   } catch (err) {
     console.error(err.data);
@@ -52,6 +54,7 @@ export async function mintWalletAndFund(address, fundBalance = BALANCE) {
 
 export async function newTransaction(client, data, key) {
   try {
+    console.log("Client:", client);
     const tx = await client.createTransaction({ data, key });
     console.info("New transaction done!", tx);
     return tx;
@@ -61,17 +64,21 @@ export async function newTransaction(client, data, key) {
   }
 }
 
-// TEST
-// async function processTxs(client) {
-//   try {
-//     const { jwk: key, address } = await generateWalletAndAddress(client);
-//     // const owner = address;
-//     await mintWalletAndFund(address);
-//     // fs.readFile() blabla ???
-//     const data = '<html><head><meta charset="UTF-8"><title>Hello world!</title></head><body></body></html>';
-//     await newTransaction(client, data, key);
-//     return true;
-//   } catch (err) {
-//     process.exit(1);
-//   }
-// }
+export async function findByOwner(owner: string) {
+  const findByOwner = gql`
+    query findByOwner(owner: String!){
+      transactions(owners:[owner]) {
+          edges {
+              node {
+                  id
+              }
+          }
+      }
+    }
+  `;
+  const query = findByOwner;
+  const result = await request(ARWEAVE_GRAPHQL_URL, query, {
+    owner,
+  });
+  return result;
+}
