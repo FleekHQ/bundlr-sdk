@@ -5,11 +5,9 @@ import { newTransaction, generateWalletAndAddress, getBalance, mintWalletAndFund
 
 const defaultConfig = {
   host: "127.0.0.1",
-  port: 80,
+  port: 1984,
   protocol: "http",
 };
-
-const gqlEndpoint = `${defaultConfig.host}:${defaultConfig.port}/graphql`;
 export class FleekWeave {
   public address;
   private client;
@@ -17,9 +15,10 @@ export class FleekWeave {
 
   constructor(config = {}) {
     // If you want to connect directly to a node
-    const cfg = config ? config : defaultConfig;
+    const cfg = defaultConfig;
+    console.log("cfg: ", cfg);
     this.client = Arweave.init(cfg);
-    console.log('client: ', this.client.api);
+    console.log("init client: ", this.client.api.config);
     this.address = null;
   }
 
@@ -66,6 +65,5 @@ export class FleekWeave {
     }
     const txs = await findByOwner(this.address);
     return txs;
-  };
-
+  }
 }
