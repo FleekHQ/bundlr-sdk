@@ -66,13 +66,13 @@ export async function newTransaction(client, data, key) {
 
 export async function findByOwner(owner: string) {
   const findByOwner = gql`
-    query findByOwner(owner: String!){
-      transactions(owners:[owner]) {
-          edges {
-              node {
-                  id
-              }
+    query findByOwner($owner: String!) {
+      transactions(owners: [$owner]) {
+        edges {
+          node {
+            id
           }
+        }
       }
     }
   `;
@@ -80,5 +80,24 @@ export async function findByOwner(owner: string) {
   const result = await request(ARWEAVE_GRAPHQL_URL, query, {
     owner,
   });
+  console.log("RESULT: ", result);
+  return result;
+}
+
+export async function getTransactionIds() {
+  const findTransactions = gql`
+    query {
+      transactions {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }
+  `;
+  const query = findTransactions;
+  const result = await request(ARWEAVE_GRAPHQL_URL, query);
+  console.log('RESULT: ', JSON.stringify(result));
   return result;
 }

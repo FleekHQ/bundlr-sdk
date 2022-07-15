@@ -32,7 +32,18 @@ export const getTransactionsByOwner = async (req: Request, res: Response) => {
   try {
     console.log("getTransactionsByOwner");
     const txs = await fleekWeave.getTransactions();
-    return res.json({ txs });
+    return res.json({ data: txs });
+  } catch (err) {
+    console.log("Error: ", err);
+    res.status(404).send(err);
+  }
+};
+
+export const getTransactionsIds = async (req: Request, res: Response) => {
+  try {
+    console.log("getTransactionsIds");
+    const txs = await fleekWeave.getTransactionsIds();
+    return res.json({ data: txs });
   } catch (err) {
     console.log("Error: ", err);
     res.status(404).send(err);

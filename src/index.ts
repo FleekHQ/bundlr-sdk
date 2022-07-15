@@ -1,6 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Arweave = require("arweave");
-import { newTransaction, generateWalletAndAddress, getBalance, mintWalletAndFund, findByOwner } from "./arweave/api";
+import {
+  getTransactionIds,
+  newTransaction,
+  generateWalletAndAddress,
+  getBalance,
+  mintWalletAndFund,
+  findByOwner,
+} from "./arweave/api";
 // @TODO: Move this to its own module ?
 
 const defaultConfig = {
@@ -64,6 +71,15 @@ export class FleekWeave {
       throw new Error("Need to set an address first");
     }
     const txs = await findByOwner(this.address);
+    return txs;
+  }
+
+  public async getTransactionsIds() {
+    if (!this.address || !this.jwk) {
+      throw new Error("Need to set an address first");
+    }
+    const txs = await getTransactionIds();
+    console.log('transactions: ', txs);
     return txs;
   }
 }
