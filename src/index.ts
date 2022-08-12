@@ -6,14 +6,6 @@ const defaultConfig = {
   network: "arweave", // make optional
   nodeUri: "https://node1.bundlr.network", // replace with dev env
 };
-
-function parseInput (input) {
-  const amount = new BigNumber(input).multipliedBy(bundlrInstance.currencyConfig.base[1])
-  if (amount.isLessThan(1)) {
-    throw Error("Value too small");
-  }
-  return amount
-};
 export class FleekBundlr {
   private client;
   public address;
@@ -41,6 +33,14 @@ export class FleekBundlr {
     return this.address;
   }
 
+  private parseInput (input) {
+    const amount = new BigNumber(input).multipliedBy(this.client.currencyConfig.base[1])
+    if (amount.isLessThan(1)) {
+      throw Error("Value too small");
+    }
+    return amount
+  };
+
   public async fundWallet(amount) {
     // you should have 0 balance (unless you've funded before), so lets add some funds:
     // Reminder: this is in atomic units (see https://docs.bundlr.network/docs/faq#what-are-baseatomic-units)
@@ -49,8 +49,8 @@ export class FleekBundlr {
     if (!amount) {
       throw Error('Need to send amount for funding wallet!');
     }
-    const amountParsed = parseInput(amount)
-    let response = await bundlrInstance.fund(amountParsed)
+    const amountParsed = this.parseInput(amount)
+    let response = await this.client.fund(amountParsed)
     console.log('Wallet funded: ', response)
   }
   
@@ -67,7 +67,7 @@ export class FleekBundlr {
   }
 
   public async uploadFile(file) {
-    let tx = await bundlrInstance.uploader.upload(file);
+    let tx = await this.client.uploader.upload(file);
     console.log('tx: ', tx);
   }
   
@@ -81,7 +81,6 @@ export class FleekBundlr {
   
     // create a Bundlr Transaction
     const tx = this.client.createTransaction(data)
-
     // want to know how much you'll need for an upload? simply:
     // get the number of bytes you want to upload
     const size = tx.size
