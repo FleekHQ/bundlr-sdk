@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -19,5 +19,5 @@
     "inlineSources": true
   },
   "include": ["**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts", "dist"]
 }

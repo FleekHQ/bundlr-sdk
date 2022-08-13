@@ -1,25 +1,32 @@
 import Bundlr from '@bundlr-network/client';
 import BigNumber from 'bignumber.js';
-import { readFileSync } from "fs";
 
-const defaultConfig = {
-  network: "arweave", // make optional
-  nodeUri: "https://node1.bundlr.network", // replace with dev env
+interface BundlrConfig {
+  url: string,
+  currency: string,
+  key: string,
+  custom?: { timeout?: number; providerUrl?: string; contractAddress?: string; currencyOpts?: any; }
 };
+
 export class FleekBundlr {
   private client;
+  public currency;
   public address;
 
-  constructor(config = null) {
-    // If you want to connect directly to a node
-    const cfg = config ? config : defaultConfig;
-    const key = JSON.parse(readFileSync("wallet.json").toString());
-    console.log("cfg: ", cfg);
-    const bundlrInstance = new Bundlr(cfg.nodeUri, cfg.network, key);
-    this.client = bundlrInstance
-    console.log("init client: ", this.client);
+  constructor(url, currency, key, custom = null) {
+    const bundlrInstance = new Bundlr(
+        url,
+        currency,
+        key
+    );
+
+    this.client = bundlrInstance;
+    this.currency = currency;
     this.address = bundlrInstance.address;
-    console.log("address: ", this.address);
+  }
+
+  public getCurrency() {
+    return this.client.currency;
   }
 
   public getAddress() {
@@ -27,9 +34,6 @@ export class FleekBundlr {
       console.log("Need to set an address first");
       return null;
     }
-
-    // get your account address (associated with your private key)
-    const address = bundlrInstance.address;
     return this.address;
   }
 
@@ -49,9 +53,15 @@ export class FleekBundlr {
     if (!amount) {
       throw Error('Need to send amount for funding wallet!');
     }
-    const amountParsed = this.parseInput(amount)
-    let response = await this.client.fund(amountParsed)
-    console.log('Wallet funded: ', response)
+    try {
+      const amountParsed = this.parseInput(amount)
+      let response = await this.client.fund(amountParsed)
+      console.log('Wallet funded: ', response)
+    }
+    catch(err) {
+      console.error('Error while funding wallet: ', err);
+      return false;
+    }
   }
   
   public async getBalance() {
@@ -62,7 +72,6 @@ export class FleekBundlr {
     const balance = await this.client.getLoadedBalance();
     // convert it into decimal units
     const decimalBalance = this.client.utils.unitConverter(balance);
-    console.log('Balance: ', decimalBalance);
     return decimalBalance;
   }
 
